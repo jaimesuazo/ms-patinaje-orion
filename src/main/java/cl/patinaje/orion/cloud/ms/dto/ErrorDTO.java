@@ -18,28 +18,6 @@ public class ErrorDTO {
 	private int statusHttp;
 	private String code;
 	private String message;
-	
-		
-	public int getStatusHttp() {
-		return statusHttp;
-	}
-	public void setStatusHttp(int statusHttp) {
-		this.statusHttp = statusHttp;
-	}	
-	
-	public String getCode() {
-		return code;
-	}
-	public void setCode(String code) {
-		this.code = code;
-	}
-	public String getMessage() {
-		return message;
-	}
-	public void setMessage(String message) {
-		this.message = message;
-	}
 
-	
 	
 }

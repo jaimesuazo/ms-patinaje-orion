@@ -17,12 +17,10 @@ public class ControllerAdvice {
 	@ExceptionHandler(value = OrionException.class)
 	public ResponseEntity<ErrorDTO> orionExceptionHandler(OrionException oex) {		
 		logger.error(oex.toString());
-		logger.error("error", oex);
-		ErrorDTO error = new ErrorDTO();
-		error.setCode(oex.getCode());
-		error.setMessage(oex.getMensaje());
-		error.setStatusHttp(oex.getStatus().value());	 
-
+		logger.error("[orionExceptionHandler]", oex);
+		ErrorDTO error = null;
+		error = ErrorDTO.builder().code(oex.getCode())
+				.message(oex.getMensaje()).statusHttp(oex.getStatus().value()).build();
 		return new ResponseEntity<>(error, oex.getStatus()); 
 	}
 }

@@ -10,6 +10,7 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.ResponseEntity;
@@ -66,8 +67,16 @@ public class CommonController<E, S extends CommonService<E>> {
 	
 	@DeleteMapping("/eliminar/{id}")
 	public ResponseEntity<?> eliminar( @PathVariable Long id) {
-		service.deleteById(id);
-		return ResponseEntity.noContent().build();		
+		getLogger().info(nombreClaseService + "[eliminar][O_INICIO] id {}", id);
+		try {
+			service.deleteById(id);
+			getLogger().info(nombreClaseService + "[eliminar][O_OK] {}", id);
+			return ResponseEntity.noContent().build();
+		}
+		catch (EmptyResultDataAccessException ex) {
+			getLogger().info(nombreClaseService + "[eliminar][O_OK] {} error {}", id, ex.getMessage(), ex);
+			throw new OrionException("O-404", HttpStatus.NOT_FOUND, "El dato a eliminar no existe");
+		}
 	}
 	
 	protected ResponseEntity<?> validar(BindingResult result) {
