@@ -37,8 +37,7 @@ public class CommonController<E, S extends CommonService<E>> {
 	
 	@GetMapping("/listar")
 	public ResponseEntity<?> listar() {			
-		getLogger().debug(nombreClaseService + "[listar]");
-		getLogger().warn(nombreClaseService + "[listar]");
+		getLogger().info(nombreClaseService + "[listar]");
 		
 		//throw new OrionException("O-100", HttpStatus.BAD_REQUEST, "error al obtener la lista");
 		return ResponseEntity.ok().body( service.findAll() );
@@ -92,12 +91,12 @@ public class CommonController<E, S extends CommonService<E>> {
 		return getNombreSimpleService() + " " + mensaje;
 	}
 	
-	private Logger getLogger() {
+	protected Logger getLogger() {
 		getNombreSimpleService();
 		return logger;
 	}
 	
-	private String getNombreSimpleService() {		
+	protected String getNombreSimpleService() {
 		if (nombreClaseService == null) {
 			nombreClaseService = service.getClass().getSimpleName();
 			StringTokenizer st = new StringTokenizer(nombreClaseService, "$");

@@ -1,6 +1,7 @@
 package cl.patinaje.orion.cloud.ms.models.entity;
 
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,12 +31,11 @@ public class CuestionarioSalud {
 	private List<Respuesta> respuestas;
 	
 	@Column(name="create_at")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date createAt;
+	private LocalDateTime createAt;
 	
 	@PrePersist
 	public void prePersist() {
-		this.createAt = new Date();
+		this.createAt = LocalDateTime.now();
 	}	  
 	
 	private int edadAnhos;
@@ -356,11 +356,11 @@ public class CuestionarioSalud {
 		this.respuestas = respuestas;
 	}
 
-	public Date getCreateAt() {
+	public LocalDateTime getCreateAt() {
 		return createAt;
 	}
 
-	public void setCreateAt(Date createAt) {
+	public void setCreateAt(LocalDateTime createAt) {
 		this.createAt = createAt;
 	}
 		

@@ -2,6 +2,7 @@ package cl.patinaje.orion.cloud.ms.controllers;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.StringTokenizer;
 
 import javax.validation.Valid;
 
@@ -32,8 +33,6 @@ import cl.patinaje.orion.cloud.ms.services.AlumnoService;
 public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 
 	Logger logger = LoggerFactory.getLogger(AlumnoController.class);
-	
-	
 
 	@PutMapping("/editar/{id}")
 	public ResponseEntity<?> editar(@RequestBody Alumno alumno, @PathVariable Long id) {				
@@ -115,12 +114,25 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 		}
 		
 		Resource imagen = new ByteArrayResource(optionalAlumno.get().getFoto());
-		
 		return ResponseEntity.ok()
 				.contentType(MediaType.IMAGE_JPEG)
 				.body(imagen);
-
 	}
-	
-	
+
+	@Override
+	protected Logger getLogger() {
+		getNombreSimpleService();
+		return logger;
+	}
+
+	@Override
+	protected String getNombreSimpleService() {
+		if (nombreClaseService == null) {
+			nombreClaseService = this.service.getClass().getSimpleName();
+			StringTokenizer st = new StringTokenizer(nombreClaseService, "$");
+			nombreClaseService = "[" + st.nextToken() + "]";
+		}
+		return nombreClaseService;
+	}
+
 }
