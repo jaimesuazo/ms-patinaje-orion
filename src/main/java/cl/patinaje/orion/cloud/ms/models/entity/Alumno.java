@@ -1,5 +1,6 @@
 package cl.patinaje.orion.cloud.ms.models.entity;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -48,12 +49,11 @@ public class Alumno {
 	private String estado;
 	
 	@Column(name="create_at")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date createAt;
+	private LocalDate createAt;
 
 	@PrePersist
 	public void prePersist() {
-		this.createAt = new Date();
+		this.createAt = LocalDate.now();
 	}
 	
 	@JsonIgnore
@@ -113,11 +113,11 @@ public class Alumno {
 		this.estado = estado;
 	}
 
-	public Date getCreateAt() {
+	public LocalDate getCreateAt() {
 		return createAt;
 	}
 
-	public void setCreateAt(Date createAt) {
+	public void setCreateAt(LocalDate createAt) {
 		this.createAt = createAt;
 	}
 

@@ -1,7 +1,9 @@
 package cl.patinaje.orion.cloud.ms.models.entity;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -41,12 +43,11 @@ public class MantenedorPregunta {
 	private List<GrupoPregunta> grupos;
 	
 	@Column(name="create_at")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date createAt;
+	private LocalDate createAt;
 	
 	@PrePersist
 	public void prePersist() {
-		this.createAt = new Date();
+		this.createAt = LocalDate.now();
 	}
 
 	public Long getId() {
@@ -73,12 +74,25 @@ public class MantenedorPregunta {
 		this.grupos = grupos;
 	}
 
-	public Date getCreateAt() {
+	public LocalDate getCreateAt() {
 		return createAt;
 	}
 
-	public void setCreateAt(Date createAt) {
+	public void setCreateAt(LocalDate createAt) {
 		this.createAt = createAt;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		MantenedorPregunta that = (MantenedorPregunta) o;
+		return Objects.equals(id, that.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
 	}
 
 	@Override

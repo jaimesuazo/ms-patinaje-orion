@@ -1,8 +1,10 @@
 package cl.patinaje.orion.cloud.ms.models.entity;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,15 +40,14 @@ public class GrupoPregunta {
 	private String texto;
 	
 	@Column(name="create_at")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date createAt;
+	private LocalDate createAt;
 	
 	@OneToMany(fetch = FetchType.LAZY)
 	private List<Pregunta> preguntas;	
 	
 	@PrePersist
 	public void prePersist() {
-		this.createAt = new Date();
+		this.createAt = LocalDate.now();
 	}
 
 	public GrupoPregunta() {
@@ -59,5 +60,28 @@ public class GrupoPregunta {
 	
 	public void removePregunta(Pregunta pregunta) {
 		this.preguntas.remove(pregunta);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		GrupoPregunta that = (GrupoPregunta) o;
+		return Objects.equals(id, that.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public String toString() {
+		return "GrupoPregunta{" +
+				"id=" + id +
+				", texto='" + texto + '\'' +
+				", createAt=" + createAt +
+				", preguntas=" + preguntas +
+				'}';
 	}
 }

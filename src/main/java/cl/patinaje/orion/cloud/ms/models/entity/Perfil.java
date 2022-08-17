@@ -1,6 +1,8 @@
 package cl.patinaje.orion.cloud.ms.models.entity;
 
+import java.time.LocalDate;
 import java.util.Date;
+import java.util.Objects;
 
 
 import javax.persistence.Column;
@@ -36,12 +38,11 @@ public class Perfil {
 	private String nombre;
 	
 	@Column(name="create_at")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date createAt;
+	private LocalDate createAt;
 	
 	@PrePersist
 	public void prePersist() {
-		this.createAt = new Date();
+		this.createAt = LocalDate.now();
 	}
 
 	public Long getId() {
@@ -60,14 +61,33 @@ public class Perfil {
 		this.nombre = nombre;
 	}
 
-	public Date getCreateAt() {
+	public LocalDate getCreateAt() {
 		return createAt;
 	}
 
-	public void setCreateAt(Date createAt) {
+	public void setCreateAt(LocalDate createAt) {
 		this.createAt = createAt;
 	}
-	
-	
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Perfil perfil = (Perfil) o;
+		return Objects.equals(id, perfil.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
+
+	@Override
+	public String toString() {
+		return "Perfil{" +
+				"id=" + id +
+				", nombre='" + nombre + '\'' +
+				", createAt=" + createAt +
+				'}';
+	}
 }

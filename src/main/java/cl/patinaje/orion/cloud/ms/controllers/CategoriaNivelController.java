@@ -34,43 +34,8 @@ public class CategoriaNivelController  extends CommonController<CategoriaNivel, 
 		categoriaDb.setNombre( categoria.getNombre() );
 		categoriaDb.setEstado( categoria.getEstado() );
 		categoriaDb.setCreateAt(categoriaDb.getCreateAt());
-		
-		if (!categoria.getAlumnos().isEmpty()) {
-			categoriaDb.setAlumnos(categoria.getAlumnos());	
-		}
-		
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(categoriaDb));		
 	}
-	
-	@PutMapping("/{id}/asignar-alumnos")
-	public ResponseEntity<?> asignarAlumnos(@RequestBody List<Alumno> alumnos, @PathVariable Long id) {
-		Optional<CategoriaNivel> catDb = this.service.findById(id);
-		
-		if (catDb.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
-		
-		CategoriaNivel categoriaDB = catDb.get();
-		
-		alumnos.forEach(oaTemp -> {
-			categoriaDB.addAlumno(oaTemp);
-		});
-		
-		return ResponseEntity.status(HttpStatus.CREATED).body(this.service.save(categoriaDB));
-	}
-	
-	@PutMapping("/{id}/eliminar-alumno")
-	public ResponseEntity<?> eliminarAlumno(@RequestBody Alumno alumno, @PathVariable Long id) {
-		Optional<CategoriaNivel> catDb = this.service.findById(id);
-		
-		if (catDb.isEmpty()) {
-			return ResponseEntity.notFound().build();
-		}
-		
-		CategoriaNivel categoriaDb = catDb.get();		
-		categoriaDb.removeAlumno(alumno);
-		
-		return ResponseEntity.status(HttpStatus.CREATED).body(this.service.save(categoriaDb));
-	}
-	
+
 }
