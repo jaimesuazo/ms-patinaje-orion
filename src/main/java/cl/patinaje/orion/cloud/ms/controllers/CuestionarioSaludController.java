@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 	
 	@Override
 	@PostMapping(path = "/crear")
+	@Transactional
 	public ResponseEntity<?> crear(@Valid @RequestBody CuestionarioSalud cuestionario, BindingResult result) {
 		getLogger().info("[crear][cuestionario][" + cuestionario + "][ORION_INI]");
 		try {
@@ -59,6 +61,7 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 	}
 
 	@PutMapping("/editar/{id}")
+	@Transactional
 	public ResponseEntity<?> editar(@RequestBody CuestionarioSalud cuestionario, @PathVariable Long id) {
 		getLogger().info("[editar][id][" + id + "][ORION_INI]");
 		Optional<CuestionarioSalud> o = service.findById(id);		
@@ -102,6 +105,7 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 	}
 
 	@PutMapping("/{id}/asignar-respuestas")
+	@Transactional
 	public ResponseEntity<?> asignarRespuestas(@RequestBody List<Respuesta> respuestas, @PathVariable Long id) {
 
 		getLogger().info("[asignarRespuestas][idCuestionario][" + id + "][ORION_INI]");
@@ -122,6 +126,7 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 	}
 	
 	@PutMapping("/{id}/editar-respuesta")
+	@Transactional
 	public ResponseEntity<?> editarRespuesta(@RequestBody Respuesta respuesta, @PathVariable Long id) {
 		getLogger().info("[editarRespuesta][idCuestionario][" + id + "][ORION_INI]");
 		Optional<CuestionarioSalud> oc = this.service.findById(id);
@@ -147,12 +152,14 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 	}
 
 	@GetMapping("/listarCuestionariosPorAlumno/{rut}")
+	@Transactional
 	public ResponseEntity<?> findCuestionariosByAlumnoId(@PathVariable Long rut) {
 		getLogger().debug("[listarCuestionariosPorAlumno][rut][" + rut + "]");
 		return ResponseEntity.ok().body( service.findCuestionariosByAlumnoId(rut) );
 	}
 
 	@GetMapping("/listarCuestionariosPorFecha/{one_date}/{two_date}")
+	@Transactional
 	public ResponseEntity<?> findCuestionariosByFecha(
 			@PathVariable(value = "one_date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
 			@PathVariable(value = "two_date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate) {

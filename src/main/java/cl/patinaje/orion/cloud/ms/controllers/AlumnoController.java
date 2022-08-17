@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 	Logger logger = LoggerFactory.getLogger(AlumnoController.class);
 
 	@PutMapping("/editar/{id}")
+	@Transactional
 	public ResponseEntity<?> editar(@RequestBody Alumno alumno, @PathVariable Long id) {				
 		Optional<Alumno> o = service.findById(id);		
 		if ( o.isEmpty() ) {
@@ -52,6 +54,7 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 	
 	@Override
 	@PostMapping(path = "/crear")
+	@Transactional
 	public ResponseEntity<?> crear(@Valid @RequestBody Alumno alumno, BindingResult result) {
 		Optional<Alumno> o = service.findById(alumno.getRut());	
 		
@@ -66,6 +69,7 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 	}
 	
 	@PostMapping("/crear-con-foto")
+	@Transactional
 	public ResponseEntity<?> crearConFoto(@Valid Alumno alumno, BindingResult result, @RequestParam MultipartFile archivo) 
 			throws IOException {
 
@@ -76,6 +80,7 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 	}
 	
 	@PutMapping("/editar-con-foto/{id}")
+	@Transactional
 	public ResponseEntity<?> editarConFoto(@Valid Alumno alumno, BindingResult result, @PathVariable Long id, @RequestParam MultipartFile archivo) throws IOException {
 		
 		if ( result.hasErrors() ) {
@@ -105,11 +110,11 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 	}
 	
 	@GetMapping("/uploads/img/{id}")
+	@Transactional
 	public ResponseEntity<?> verFoto(@PathVariable Long id) {
 		Optional<Alumno> optionalAlumno = service.findById(id);
 		
 		if (optionalAlumno.isEmpty() || optionalAlumno.get().getFoto() == null) {
-			
 			return ResponseEntity.notFound().build();
 		}
 		

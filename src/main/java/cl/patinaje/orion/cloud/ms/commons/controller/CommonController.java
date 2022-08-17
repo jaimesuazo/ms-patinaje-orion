@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ public class CommonController<E, S extends CommonService<E>> {
 	
 	
 	@GetMapping("/listar")
+	@Transactional
 	public ResponseEntity<?> listar() {			
 		getLogger().info(nombreClaseService + "[listar]");
 		
@@ -44,6 +46,7 @@ public class CommonController<E, S extends CommonService<E>> {
 	}
 	
 	@GetMapping("/detalle/{id}")
+	@Transactional
 	public ResponseEntity<?> ver(@PathVariable Long id) {
 		Optional<E> o = service.findById(id);		
 		if ( o.isEmpty() ) {
@@ -54,6 +57,7 @@ public class CommonController<E, S extends CommonService<E>> {
 	}
 	
 	@PostMapping(path = "/crear")
+	@Transactional
 	public ResponseEntity<?> crear(@Valid @RequestBody E entity, BindingResult result) {
 		if ( result.hasErrors() ) {
 			return this.validar(result);
@@ -65,6 +69,7 @@ public class CommonController<E, S extends CommonService<E>> {
 	
 	
 	@DeleteMapping("/eliminar/{id}")
+	@Transactional
 	public ResponseEntity<?> eliminar( @PathVariable Long id) {
 		getLogger().info(nombreClaseService + "[eliminar][O_INICIO] id {}", id);
 		try {

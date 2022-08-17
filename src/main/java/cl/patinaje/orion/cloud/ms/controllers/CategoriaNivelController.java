@@ -17,12 +17,15 @@ import cl.patinaje.orion.cloud.ms.models.entity.Alumno;
 import cl.patinaje.orion.cloud.ms.models.entity.CategoriaNivel;
 import cl.patinaje.orion.cloud.ms.services.CategoriaNivelService;
 
+import javax.transaction.Transactional;
+
 @RestController
 @RequestMapping(path = "/v1/categoria", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CategoriaNivelController  extends CommonController<CategoriaNivel, CategoriaNivelService> {
 
 	
 	@PutMapping("/editar/{id}")
+	@Transactional
 	public ResponseEntity<?> editar(@RequestBody CategoriaNivel categoria, @PathVariable Long id) {
 		Optional<CategoriaNivel> o = service.findById(id);	
 		
