@@ -7,12 +7,10 @@ import cl.patinaje.orion.cloud.ms.services.AlumnoService;
 import cl.patinaje.orion.cloud.ms.services.UsuarioService;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -36,6 +34,26 @@ public class UsuarioController extends CommonController<Usuario, UsuarioService>
         }
         return ResponseEntity.ok().body( o.get().getAlumnos() );
     }
+
+    @PutMapping("/editar/{id}")
+    @Transactional
+    public ResponseEntity<?> editar(@RequestBody Usuario usuario, @PathVariable Long id) {
+        Optional<Usuario> o = service.findById(id);
+        if ( o.isEmpty() ) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Usuario usuarioDb = o.get();
+        usuarioDb.setNombre( usuario.getNombre() );
+        usuarioDb.setApaterno( usuario.getApaterno() );
+        usuarioDb.setAmaterno( usuario.getAmaterno() );
+        usuarioDb.setEstado( usuario.getEstado() );
+        usuarioDb.setCreateAt(usuarioDb.getCreateAt());
+        usuarioDb.setPerfiles(usuario.getPerfiles());
+        usuarioDb.setAlumnos(usuario.getAlumnos());
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(usuarioDb));
+    }
+
 
     @Override
     protected Logger getLogger() {

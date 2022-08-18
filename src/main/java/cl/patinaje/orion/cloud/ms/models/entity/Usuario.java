@@ -9,12 +9,12 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table( name="usuarios")
@@ -46,11 +46,21 @@ public class Usuario {
     @Column(name="create_at")
     private LocalDate createAt;
 
+    @PrePersist
+    public void prePersist() {
+        this.createAt = LocalDate.now();
+    }
+
     @OneToMany(fetch = FetchType.LAZY)
     private List<Alumno> alumnos;
 
     @OneToMany(fetch = FetchType.LAZY)
     private List<Perfil> perfiles;
+
+    public Usuario() {
+        this.alumnos =  new ArrayList<>();
+        this.perfiles =  new ArrayList<>();
+    }
 
     @Override
     public boolean equals(Object o) {
