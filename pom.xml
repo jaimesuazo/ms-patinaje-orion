@@ -16,6 +16,7 @@
 	<description>Project for Spring Boot para patinaje Orion</description>
 	<properties>
 		<java.version>11</java.version>
+		<jjwt.version>0.7.0</jjwt.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -23,6 +24,7 @@
 			<artifactId>lombok</artifactId>
 			<version>1.18.20</version>
 			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>	
 		<dependency>
 		    <groupId>javax.validation</groupId>
@@ -58,16 +60,36 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>5.6.3</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-log4j2</artifactId>
-		</dependency>				 	    
+		</dependency>
+        <dependency> <!-- Ejemplo Spring Security -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        
+        <!-- Ejemplo Spring Security JWT -->
+        <dependency> 
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${jjwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.mobile</groupId>
+            <artifactId>spring-mobile-device</artifactId>
+            <version>1.1.5.RELEASE</version>
+        </dependency>						 	    
 	</dependencies>
 
 	<build>
@@ -86,7 +108,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<!--  
+				 
 				<configuration>
 				
 					<excludes>
@@ -95,7 +117,7 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
-				</configuration> -->
+				</configuration> 
 			</plugin>
 		</plugins>
 	</build>

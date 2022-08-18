@@ -1,7 +1,6 @@
 package cl.patinaje.orion.cloud.ms.services.impl;
 
 import cl.patinaje.orion.cloud.ms.commons.services.CommonServiceImpl;
-import cl.patinaje.orion.cloud.ms.models.entity.Alumno;
 import cl.patinaje.orion.cloud.ms.models.entity.Usuario;
 import cl.patinaje.orion.cloud.ms.models.repository.UsuarioRepository;
 import cl.patinaje.orion.cloud.ms.services.UsuarioService;

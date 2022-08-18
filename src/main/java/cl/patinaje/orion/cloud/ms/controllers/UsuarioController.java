@@ -10,10 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.transaction.Transactional;
-import java.util.List;
+import javax.validation.Valid;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
@@ -23,6 +25,9 @@ public class UsuarioController extends CommonController<Usuario, UsuarioService>
 
     @Autowired
     protected AlumnoService serviceAlumno;
+
+    @Autowired
+    PasswordEncoder encoder;
 
     @GetMapping("/listarAlumnosPorUsuario/{rut}")
     @Transactional
@@ -50,8 +55,23 @@ public class UsuarioController extends CommonController<Usuario, UsuarioService>
         usuarioDb.setEstado( usuario.getEstado() );
         usuarioDb.setCreateAt(usuarioDb.getCreateAt());
         usuarioDb.setPerfiles(usuario.getPerfiles());
+        usuarioDb.setEmail(usuario.getEmail());
         usuarioDb.setAlumnos(usuario.getAlumnos());
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(usuarioDb));
+    }
+
+    @PostMapping(path = "/crear")
+    @Transactional
+    @Override
+    public ResponseEntity<?> crear(@Valid @RequestBody Usuario usuario, BindingResult result) {
+        if ( result.hasErrors() ) {
+            return this.validar(result);
+        }
+
+        usuario.setClave(encoder.encode(usuario.getClave()));
+        Usuario entityDb = service.save(usuario);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(entityDb);
     }
 
 

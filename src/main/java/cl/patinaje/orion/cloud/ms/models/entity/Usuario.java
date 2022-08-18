@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -56,6 +57,14 @@ public class Usuario {
 
     @OneToMany(fetch = FetchType.LAZY)
     private List<Perfil> perfiles;
+
+    @Column(length = 40)
+    private String email;
+
+    @Column(length = 255)
+    private String clave;
+    
+    private LocalDate lastPasswordResetDate;
 
     public Usuario() {
         this.alumnos =  new ArrayList<>();
