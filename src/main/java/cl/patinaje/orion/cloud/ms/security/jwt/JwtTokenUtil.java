@@ -1,16 +1,20 @@
 package cl.patinaje.orion.cloud.ms.security.jwt;
 
+import cl.patinaje.orion.cloud.ms.exception.OrionException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -163,4 +167,26 @@ public class JwtTokenUtil implements Serializable {
                         && !isTokenExpired(token)
                         && !isCreatedBeforeLastPasswordReset(created, user.getLastPasswordResetDate()));
     }
+
+    public boolean validarUsuarioVsRutConsulta(HttpServletRequest context, String token, Long rutConsulta) {
+        String rutToken = this.getUsernameFromToken(token);
+        Object userDetailsPaso =  context.getSession(false).getAttribute("userDetails");
+        UserDetails userDetails = (UserDetails) userDetailsPaso;
+
+        if ( userDetails != null && userDetails.getAuthorities() != null
+                && userDetails.getAuthorities().size() == 1 ) {
+            List roles = (List)  userDetails.getAuthorities();
+
+            if ( roles.get(0).toString().trim().equals("ROLE_APO")
+                    ||  roles.get(0).toString().trim().equals("ROLE_ALUMNO")) {
+                if (rutToken != null && !rutToken.equals( String.valueOf( rutConsulta) )) {
+                    throw new OrionException("oSecurityRutSesion",
+                            HttpStatus.FORBIDDEN,
+                                "El rut consultado no es el mismo de la sesion");
+                }
+            }
+        }
+        return true;
+    }
+
 }

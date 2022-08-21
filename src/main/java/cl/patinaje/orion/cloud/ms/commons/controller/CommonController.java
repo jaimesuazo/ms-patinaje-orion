@@ -5,9 +5,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
+import cl.patinaje.orion.cloud.ms.security.jwt.JwtTokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,12 @@ import cl.patinaje.orion.cloud.ms.exception.OrionException;
 @CrossOrigin({"http://localhost:8080"})
 public class CommonController<E, S extends CommonService<E>> {
 
+	@Autowired
+	protected JwtTokenUtil jwtTokenUtil;
+
+	@Autowired
+	protected HttpServletRequest context;
+	public static final String AUTHORIZATION = "Authorization";
 	protected Logger logger = LoggerFactory.getLogger(CommonController.class);
 	
 	protected String nombreClaseService = null; 

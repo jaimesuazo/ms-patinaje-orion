@@ -32,8 +32,9 @@ public class UsuarioController extends CommonController<Usuario, UsuarioService>
     @GetMapping("/listarAlumnosPorUsuario/{rut}")
     @Transactional
     @PreAuthorize("hasAnyRole('ROLE_ADM', 'ROLE_TEACHER', 'ROLE_OFICLUB', 'ROLE_APO')")
-    public ResponseEntity<?> findAlumnosByIdUsuario(@PathVariable Long rut) {
+    public ResponseEntity<?> findAlumnosByIdUsuario(@RequestHeader(AUTHORIZATION) final String jwt, @PathVariable Long rut) {
         getLogger().debug("[findAlumnosByIdUsuario][rut][" + rut + "]");
+        jwtTokenUtil.validarUsuarioVsRutConsulta(context, jwt, rut);
         Optional<Usuario> o = service.findById(rut);
         if ( o.isEmpty() ) {
             return ResponseEntity.notFound().build();
