@@ -14,6 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +38,7 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 
 	@PutMapping("/editar/{id}")
 	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADM')")
 	public ResponseEntity<?> editar(@RequestBody Alumno alumno, @PathVariable Long id) {				
 		Optional<Alumno> o = service.findById(id);		
 		if ( o.isEmpty() ) {
@@ -55,6 +57,7 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 	@Override
 	@PostMapping(path = "/crear")
 	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADM')")
 	public ResponseEntity<?> crear(@Valid @RequestBody Alumno alumno, BindingResult result) {
 		Optional<Alumno> o = service.findById(alumno.getRut());	
 		
@@ -70,6 +73,7 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 	
 	@PostMapping("/crear-con-foto")
 	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADM')")
 	public ResponseEntity<?> crearConFoto(@Valid Alumno alumno, BindingResult result, @RequestParam MultipartFile archivo) 
 			throws IOException {
 
@@ -81,6 +85,7 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 	
 	@PutMapping("/editar-con-foto/{id}")
 	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADM')")
 	public ResponseEntity<?> editarConFoto(@Valid Alumno alumno, BindingResult result, @PathVariable Long id, @RequestParam MultipartFile archivo) throws IOException {
 		
 		if ( result.hasErrors() ) {
@@ -111,6 +116,7 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 	
 	@GetMapping("/uploads/img/{id}")
 	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADM')")
 	public ResponseEntity<?> verFoto(@PathVariable Long id) {
 		Optional<Alumno> optionalAlumno = service.findById(id);
 		

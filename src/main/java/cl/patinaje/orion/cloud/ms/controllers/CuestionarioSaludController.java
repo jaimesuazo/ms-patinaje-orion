@@ -18,6 +18,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +40,7 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 	@Override
 	@PostMapping(path = "/crear")
 	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADM', 'ROLE_TEACHER', 'ROLE_APO', 'ROLE_ALUMNO')")
 	public ResponseEntity<?> crear(@Valid @RequestBody CuestionarioSalud cuestionario, BindingResult result) {
 		getLogger().info("[crear][cuestionario][" + cuestionario + "][ORION_INI]");
 		try {
@@ -62,6 +64,7 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 
 	@PutMapping("/editar/{id}")
 	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADM', 'ROLE_TEACHER', 'ROLE_APO', 'ROLE_ALUMNO')")
 	public ResponseEntity<?> editar(@RequestBody CuestionarioSalud cuestionario, @PathVariable Long id) {
 		getLogger().info("[editar][id][" + id + "][ORION_INI]");
 		Optional<CuestionarioSalud> o = service.findById(id);		
@@ -106,6 +109,7 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 
 	@PutMapping("/{id}/asignar-respuestas")
 	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADM', 'ROLE_TEACHER', 'ROLE_APO', 'ROLE_ALUMNO')")
 	public ResponseEntity<?> asignarRespuestas(@RequestBody List<Respuesta> respuestas, @PathVariable Long id) {
 
 		getLogger().info("[asignarRespuestas][idCuestionario][" + id + "][ORION_INI]");
@@ -127,6 +131,7 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 	
 	@PutMapping("/{id}/editar-respuesta")
 	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADM', 'ROLE_TEACHER', 'ROLE_APO', 'ROLE_ALUMNO')")
 	public ResponseEntity<?> editarRespuesta(@RequestBody Respuesta respuesta, @PathVariable Long id) {
 		getLogger().info("[editarRespuesta][idCuestionario][" + id + "][ORION_INI]");
 		Optional<CuestionarioSalud> oc = this.service.findById(id);
@@ -153,6 +158,7 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 
 	@GetMapping("/listarCuestionariosPorAlumno/{rut}")
 	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADM', 'ROLE_TEACHER', 'ROLE_OFICLUB')")
 	public ResponseEntity<?> findCuestionariosByAlumnoId(@PathVariable Long rut) {
 		getLogger().debug("[listarCuestionariosPorAlumno][rut][" + rut + "]");
 		return ResponseEntity.ok().body( service.findCuestionariosByAlumnoId(rut) );
@@ -160,6 +166,7 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 
 	@GetMapping("/listarCuestionariosPorFecha/{one_date}/{two_date}")
 	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADM', 'ROLE_TEACHER', 'ROLE_OFICLUB')")
 	public ResponseEntity<?> findCuestionariosByFecha(
 			@PathVariable(value = "one_date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
 			@PathVariable(value = "two_date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate) {

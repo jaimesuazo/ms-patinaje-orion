@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +27,7 @@ public class CategoriaNivelController  extends CommonController<CategoriaNivel, 
 	
 	@PutMapping("/editar/{id}")
 	@Transactional
+	@PreAuthorize("hasAnyRole('ROLE_ADM')")
 	public ResponseEntity<?> editar(@RequestBody CategoriaNivel categoria, @PathVariable Long id) {
 		Optional<CategoriaNivel> o = service.findById(id);	
 		

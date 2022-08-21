@@ -1,5 +1,7 @@
 package cl.patinaje.orion.cloud.ms.security.jwt;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -14,6 +16,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public final class JwtUserFactory {
+
+    private static final Log logger = LogFactory.getLog(JwtUserFactory.class);
 
     private JwtUserFactory() {
     }
@@ -31,10 +35,11 @@ public final class JwtUserFactory {
 
         List<Perfil> listaPerfiles = user.getPerfiles();
 
-        if ( listaPerfiles== null ) {
+        if ( listaPerfiles == null ) {
             listaPerfiles = new ArrayList<Perfil>();
         }
 
+        logger.debug("[create][listaPerfiles]" + user.getPerfiles());
         return new JwtUser(
                 user.getRut(),
                 String.valueOf( user.getRut() ),
@@ -47,9 +52,15 @@ public final class JwtUserFactory {
     }
 
     private static List<GrantedAuthority> mapToGrantedAuthorities(List<Perfil> authorities) {
-        return authorities.stream()
-                .map(authority -> new SimpleGrantedAuthority(authority.getNombre()))
-                .collect(Collectors.toList());
+        if ( authorities != null &&  authorities.size() > 0) {
+            return authorities.stream()
+                    .map(authority -> new SimpleGrantedAuthority(authority.getNombre()))
+                    .collect(Collectors.toList());
+        }
+        else {
+            return null;
+        }
     }
+
 }
 

@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @SpringBootTest
@@ -22,14 +23,14 @@ public class TestUsuario {
     PasswordEncoder encoder;
 
     @Test
-    public void modificaUsuario() {
-
+    public void modificaUsuarioJaime() {
         Optional<Usuario> usuario = usuarioRepository.findById(Long.valueOf(13496704) );
         Usuario usr = null;
         Usuario usr2 = null;
         if (usuario.isPresent()) {
             usr = usuario.get();
             usr.setClave(encoder.encode("13496704"));
+            usr.setLastPasswordResetDate(LocalDate.now());
             usr2 = usuarioRepository.save(usr);
         }
         Assertions.assertNotNull(usr);
@@ -37,4 +38,19 @@ public class TestUsuario {
         Assertions.assertEquals(usr.getClave() , usr2.getClave());
     }
 
+    @Test
+    public void modificaUsuarioLucy() {
+        Optional<Usuario> usuario = usuarioRepository.findById(Long.valueOf(14026311) );
+        Usuario usr = null;
+        Usuario usr2 = null;
+        if (usuario.isPresent()) {
+            usr = usuario.get();
+            usr.setClave(encoder.encode("14026311"));
+            usr.setLastPasswordResetDate(LocalDate.now());
+            usr2 = usuarioRepository.save(usr);
+        }
+        Assertions.assertNotNull(usr);
+        Assertions.assertNotNull(usr2);
+        Assertions.assertEquals(usr.getClave() , usr2.getClave());
+    }
 }

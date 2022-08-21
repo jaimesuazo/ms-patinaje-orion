@@ -1,7 +1,6 @@
 package cl.patinaje.orion.cloud.ms.controllers;
 
 import cl.patinaje.orion.cloud.ms.commons.controller.CommonController;
-import cl.patinaje.orion.cloud.ms.models.entity.Alumno;
 import cl.patinaje.orion.cloud.ms.models.entity.Usuario;
 import cl.patinaje.orion.cloud.ms.services.AlumnoService;
 import cl.patinaje.orion.cloud.ms.services.UsuarioService;
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +31,7 @@ public class UsuarioController extends CommonController<Usuario, UsuarioService>
 
     @GetMapping("/listarAlumnosPorUsuario/{rut}")
     @Transactional
+    @PreAuthorize("hasAnyRole('ROLE_ADM', 'ROLE_TEACHER', 'ROLE_OFICLUB', 'ROLE_APO')")
     public ResponseEntity<?> findAlumnosByIdUsuario(@PathVariable Long rut) {
         getLogger().debug("[findAlumnosByIdUsuario][rut][" + rut + "]");
         Optional<Usuario> o = service.findById(rut);
@@ -42,6 +43,7 @@ public class UsuarioController extends CommonController<Usuario, UsuarioService>
 
     @PutMapping("/editar/{id}")
     @Transactional
+    @PreAuthorize("hasAnyRole('ROLE_ADM')")
     public ResponseEntity<?> editar(@RequestBody Usuario usuario, @PathVariable Long id) {
         Optional<Usuario> o = service.findById(id);
         if ( o.isEmpty() ) {
@@ -63,6 +65,7 @@ public class UsuarioController extends CommonController<Usuario, UsuarioService>
     @PostMapping(path = "/crear")
     @Transactional
     @Override
+    @PreAuthorize("hasAnyRole('ROLE_ADM')")
     public ResponseEntity<?> crear(@Valid @RequestBody Usuario usuario, BindingResult result) {
         if ( result.hasErrors() ) {
             return this.validar(result);

@@ -2,15 +2,12 @@ package cl.patinaje.orion.cloud.ms.models.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,7 +52,7 @@ public class Usuario {
     @OneToMany(fetch = FetchType.LAZY)
     private List<Alumno> alumnos;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Perfil> perfiles;
 
     @Column(length = 40)
