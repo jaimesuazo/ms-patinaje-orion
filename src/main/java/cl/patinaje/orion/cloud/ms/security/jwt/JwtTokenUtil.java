@@ -157,6 +157,12 @@ public class JwtTokenUtil implements Serializable {
         return refreshedToken;
     }
 
+    /**
+     * Valida que el token JWT es correcto
+     * @param token JWT a validar.
+     * @param userDetails con los datos del usuario que realizó la consulta.
+     * @return válido true o no válido false.
+     */
     public Boolean validateToken(String token, UserDetails userDetails) {
         JwtUser user = (JwtUser) userDetails;
         final String username = getUsernameFromToken(token);

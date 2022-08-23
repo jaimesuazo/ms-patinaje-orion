@@ -17,6 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Clase que filtra las peticiones http o https definidas en
+ * cl.patinaje.orion.cloud.ms.security.SecurityConfig
+ *
+ */
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
     private final Log logger = LogFactory.getLog(this.getClass());
@@ -30,6 +35,18 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     @Value("${jwt.header}")
     private String tokenHeader;
 
+    /**
+     * Método que aplica filtros definidos en SecurityConfig.
+     * Si tiene usuario y su token expiró lo elimina de la sesion y la invalida. Esto se realizó
+     * para no ir a cada momento a buscar a base de datos los roles del usuario, cuando se valida el
+     * RUT del usuario vs el rut buscado, esto es para los casos de ROLE_APO, ROLE_ALUMNO.
+     *
+     * @param request
+     * @param response
+     * @param chain
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         String authToken = request.getHeader(this.tokenHeader);
@@ -37,14 +54,12 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         // String authToken = header.substring(7);
         String username = jwtTokenUtil.getUsernameFromToken(authToken);
 
-        logger.info("checking authentication for user " + username);
-        logger.info("SecurityContextHolder.getContext().getAuthentication() " + SecurityContextHolder.getContext().getAuthentication());
-        logger.info("chain " + chain);
-        logger.info("SecurityContextHolder.getContext() " + SecurityContextHolder.getContext());
-
+        getLogger().info("checking authentication for user " + username);
+        getLogger().info("SecurityContextHolder.getContext().getAuthentication() " + SecurityContextHolder.getContext().getAuthentication());
+        getLogger().info("chain " + chain);
+        getLogger().info("SecurityContextHolder.getContext() " + SecurityContextHolder.getContext());
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
             // It is not compelling necessary to load the use details from the database. You could also store the information
             // in the token and read it from it. It's up to you ;)
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
@@ -54,12 +69,23 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             if (jwtTokenUtil.validateToken(authToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                logger.info("authenticated user " + username + ", setting security context");
+                getLogger().info("authenticated user " + username + ", setting security context");
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 request.getSession(true).setAttribute("userDetails", userDetails);
+            }
+            else {
+                if ( request.getSession(false) != null ) {
+                    request.getSession(false).removeAttribute("userDetails");
+                    request.getSession(false).invalidate();
+                    getLogger().info("userDetails removed for user " + username);
+                }
             }
         }
 
         chain.doFilter(request, response);
+    }
+
+    protected Log getLogger() {
+        return logger;
     }
 }
