@@ -1,9 +1,13 @@
 package cl.patinaje.orion.cloud.ms.security.jwt;
 
 import cl.patinaje.orion.cloud.ms.exception.OrionException;
+import cl.patinaje.orion.cloud.ms.services.UsuarioService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.mobile.device.Device;
@@ -30,11 +34,16 @@ public class JwtTokenUtil implements Serializable {
     private static final String AUDIENCE_MOBILE = "mobile";
     private static final String AUDIENCE_TABLET = "tablet";
 
+    protected Logger logger = LoggerFactory.getLogger(JwtTokenUtil.class);
+
     @Value("${jwt.secret}")
     private String secret;
 
     @Value("${jwt.expiration}")
     private Long expiration;
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     public String getUsernameFromToken(String token) {
         String username;
@@ -174,25 +183,59 @@ public class JwtTokenUtil implements Serializable {
                         && !isCreatedBeforeLastPasswordReset(created, user.getLastPasswordResetDate()));
     }
 
+    /**
+     * Método que valida el RUT del usuario de la sesion vs el RUT consultado enviado por parámetro al MS.
+     * @param context para obtener la session.
+     * @param token JWT de la session.
+     * @param rutConsulta enviado al MS.
+     * @return true si el RUT de la session es el mismo que se consulta al MS.
+     *         false el RUT de la session no es el mismo que se consulta al MS.
+     */
     public boolean validarUsuarioVsRutConsulta(HttpServletRequest context, String token, Long rutConsulta) {
+        getLogger().info("[validarUsuarioVsRutConsulta][rutConsulta][" + rutConsulta + "]");
         String rutToken = this.getUsernameFromToken(token);
+        getLogger().debug("[validarUsuarioVsRutConsulta][rutToken][" + rutToken + "]");
         Object userDetailsPaso =  context.getSession(false).getAttribute("userDetails");
         UserDetails userDetails = (UserDetails) userDetailsPaso;
+        getLogger().debug("[validarUsuarioVsRutConsulta][userDetails][" + userDetails + "]");
 
         if ( userDetails != null && userDetails.getAuthorities() != null
-                && userDetails.getAuthorities().size() == 1 ) {
+                && ( userDetails.getAuthorities().size() == 1
+                    || userDetails.getAuthorities().size() == 2 ) ) {
             List roles = (List)  userDetails.getAuthorities();
 
-            if ( roles.get(0).toString().trim().equals("ROLE_APO")
-                    ||  roles.get(0).toString().trim().equals("ROLE_ALUMNO")) {
-                if (rutToken != null && !rutToken.equals( String.valueOf( rutConsulta) )) {
-                    throw new OrionException("oSecurityRutSesion",
-                            HttpStatus.FORBIDDEN,
-                                "El rut consultado no es el mismo de la sesion");
+                if ( roles.get(0).toString().trim().equals("ROLE_APO")
+                        ||  roles.get(0).toString().trim().equals("ROLE_ALUMNO") ) {
+                    if (rutToken != null && !rutToken.equals( String.valueOf( rutConsulta) )) {
+                        throw new OrionException("OrionSecurityRutSesionException",
+                                HttpStatus.FORBIDDEN,
+                                    "El rut consultado no es el mismo de la sesion");
+                    }
                 }
-            }
         }
         return true;
     }
 
+    /**
+     * Método que valida si el alumno dado pertence al usuario dado.
+     *
+     *
+     * @param rutUsuario RUT de usuario a validar sus alumnos.
+     * @param rutAlumno RUT de alumno al cual se desea conocer su pertenencia.
+     * @return true el alumno pertence al usuario , exception el alumno no pertence.
+     */
+    public boolean validarAlumnosDeUsuario(Long rutUsuario, Long rutAlumno) {
+        List<Long> listaIdsAlumnos = usuarioService.findAlumnosIdsByIdUsuario(rutUsuario);
+        boolean resultado = listaIdsAlumnos.contains(rutAlumno);
+        if ( !resultado ) {
+            throw new OrionException("OrionSecurityAlumnoNoPertenceUException",
+                    HttpStatus.FORBIDDEN,
+                    "El alumno no pertenece al usuario");
+        }
+        return true;
+    }
+
+    protected Logger getLogger() {
+        return logger;
+    }
 }

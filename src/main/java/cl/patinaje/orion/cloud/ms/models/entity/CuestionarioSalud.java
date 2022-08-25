@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -42,6 +43,7 @@ public class CuestionarioSalud {
 	
 	@Size(min = 1, max = 1)
 	@Column(length = 1)
+	@NotBlank(message = "El campo genero no puede ser vacío")
 	private String genero;
 	
 	private Date fechaNacimiento;
@@ -56,10 +58,12 @@ public class CuestionarioSalud {
 	
 	@Size(min = 1, max = 70)
 	@Column(length = 70)
+	@NotBlank(message = "El campo club no puede ser vacío")
 	private String club;
 	
 	@Size(min = 1, max = 70)
 	@Column(length = 70)
+	@NotBlank(message = "El campo direccion no puede ser vacío")
 	private String direccionCalle;
 	
 	@Size(min = 1, max = 10)

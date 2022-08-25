@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,18 +25,22 @@ public class Usuario {
 
     @Size(min = 1, max = 1)
     @Column(length = 1)
+    @NotBlank(message = "El campo dv no puede ser vacío")
     private String dv;
 
     @Size(min = 1, max = 70)
     @Column(length = 70)
+    @NotBlank(message = "El campo nombre no puede ser vacío")
     private String nombre;
 
     @Size(min = 1, max = 70)
     @Column(length = 70)
+    @NotBlank(message = "El campo apellido paterno no puede ser vacío")
     private String apaterno;
 
     @Size(min = 1, max = 70)
     @Column(length = 70)
+    @NotBlank(message = "El campo apellido materno no puede ser vacío")
     private String amaterno;
 
     @Size(min = 1, max = 10)
@@ -56,9 +62,11 @@ public class Usuario {
     private List<Perfil> perfiles;
 
     @Column(length = 40)
+    @Email
     private String email;
 
     @Column(length = 255)
+    @NotBlank(message = "El campo password no puede ser vacío")
     private String clave;
     
     private LocalDate lastPasswordResetDate;

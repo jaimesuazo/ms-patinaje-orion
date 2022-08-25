@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,18 +22,22 @@ public class Alumno {
 	
 	@Size(min = 1, max = 1)
 	@Column(length = 1)
+	@NotBlank(message = "El campo DV no puede ser vacío")
 	private String dv;
 	
 	@Size(min = 1, max = 70)
 	@Column(length = 70)
+	@NotBlank(message = "El campo nombre no puede ser vacío")
 	private String nombre;
 
 	@Size(min = 1, max = 70)
 	@Column(length = 70)
+	@NotBlank(message = "El campo apellido paterno no puede ser vacío")
 	private String apaterno;
 	
 	@Size(min = 1, max = 70)
 	@Column(length = 70)
+	@NotBlank(message = "El campo apellido materno no puede ser vacío")
 	private String amaterno;
 
 	@Size(min = 1, max = 10)

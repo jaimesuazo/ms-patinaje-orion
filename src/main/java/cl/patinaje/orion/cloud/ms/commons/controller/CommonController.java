@@ -56,11 +56,11 @@ public class CommonController<E, S extends CommonService<E>> {
 	@GetMapping("/detalle/{id}")
 	@Transactional
 	public ResponseEntity<?> ver(@PathVariable Long id) {
+		getLogger().info(nombreClaseService + "[ver]");
 		Optional<E> o = service.findById(id);		
 		if ( o.isEmpty() ) {
 			return ResponseEntity.notFound().build();
 		}
-		
 		return ResponseEntity.ok().body( o.get() );
 	}
 	

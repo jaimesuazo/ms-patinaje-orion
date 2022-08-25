@@ -29,24 +29,51 @@ public class UsuarioController extends CommonController<Usuario, UsuarioService>
     @Autowired
     PasswordEncoder encoder;
 
-    @GetMapping("/listarAlumnosPorUsuario/{rut}")
+    /**
+     * Método que lista los alumnos asociados a un RUT de usuario en particular.
+     *
+     *
+     * @param jwt Token JWT asociado a la session.
+     * @param rutUsuario RUT del usuario.
+     * @return Lista de los alumnos asociados al usuario dado.
+     */
+    @GetMapping("/listarAlumnosPorUsuario/{rutUsuario}")
     @Transactional
     @PreAuthorize("hasAnyRole('ROLE_ADM', 'ROLE_TEACHER', 'ROLE_OFICLUB', 'ROLE_APO')")
-    public ResponseEntity<?> findAlumnosByIdUsuario(@RequestHeader(AUTHORIZATION) final String jwt, @PathVariable Long rut) {
-        getLogger().debug("[findAlumnosByIdUsuario][rut][" + rut + "]");
-        jwtTokenUtil.validarUsuarioVsRutConsulta(context, jwt, rut);
-        Optional<Usuario> o = service.findById(rut);
+    public ResponseEntity<?> findAlumnosByIdUsuario(@RequestHeader(AUTHORIZATION) final String jwt,
+                                                        @PathVariable Long rutUsuario) {
+        getLogger().debug("[findAlumnosByIdUsuario][rut][" + rutUsuario + "]");
+        jwtTokenUtil.validarUsuarioVsRutConsulta(context, jwt, rutUsuario);
+        Optional<Usuario> o = service.findById( rutUsuario );
         if ( o.isEmpty() ) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok().body( o.get().getAlumnos() );
     }
 
-    @PutMapping("/editar/{id}")
+    /**
+     * Método que edita los datos del usuario dado.
+     *
+     *
+     * @param jwt Token JWT asociado a la session.
+     * @param usuario con todos los datos del usuario.
+     * @param rutUsuario Rut del usuario que realiza la solicitud de edición.
+     * @return Usuario modificado.
+     */
+    @PutMapping("/editar/{rutUsuario}")
     @Transactional
-    @PreAuthorize("hasAnyRole('ROLE_ADM')")
-    public ResponseEntity<?> editar(@RequestBody Usuario usuario, @PathVariable Long id) {
-        Optional<Usuario> o = service.findById(id);
+    @PreAuthorize("hasAnyRole('ROLE_ADM', 'ROLE_APO')")
+    public ResponseEntity<?> editar(@RequestHeader(AUTHORIZATION) final String jwt,
+                                        @Valid  @RequestBody Usuario usuario, BindingResult result,
+                                            @PathVariable Long rutUsuario) {
+        getLogger().debug("[editar][rutUsuario][" + rutUsuario + "]");
+        jwtTokenUtil.validarUsuarioVsRutConsulta(context, jwt, rutUsuario);
+
+        if ( result.hasErrors() ) {
+            return this.validar(result);
+        }
+
+        Optional<Usuario> o = service.findById(rutUsuario);
         if ( o.isEmpty() ) {
             return ResponseEntity.notFound().build();
         }
@@ -57,6 +84,7 @@ public class UsuarioController extends CommonController<Usuario, UsuarioService>
         usuarioDb.setAmaterno( usuario.getAmaterno() );
         usuarioDb.setEstado( usuario.getEstado() );
         usuarioDb.setCreateAt(usuarioDb.getCreateAt());
+        usuario.setClave( encoder.encode(usuario.getClave()) );
         usuarioDb.setPerfiles(usuario.getPerfiles());
         usuarioDb.setEmail(usuario.getEmail());
         usuarioDb.setAlumnos(usuario.getAlumnos());
@@ -71,13 +99,11 @@ public class UsuarioController extends CommonController<Usuario, UsuarioService>
         if ( result.hasErrors() ) {
             return this.validar(result);
         }
-
-        usuario.setClave(encoder.encode(usuario.getClave()));
+        usuario.setDv( usuario.getDv().toUpperCase() );
+        usuario.setClave( encoder.encode(usuario.getClave()) );
         Usuario entityDb = service.save(usuario);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(entityDb);
     }
-
 
     @Override
     protected Logger getLogger() {

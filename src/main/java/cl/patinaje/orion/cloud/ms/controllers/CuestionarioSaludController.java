@@ -2,9 +2,7 @@ package cl.patinaje.orion.cloud.ms.controllers;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -36,37 +34,74 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 	private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
 	Logger logger = LoggerFactory.getLogger(CuestionarioSaludController.class);
-	
-	@Override
-	@PostMapping(path = "/crear")
+
+	/**
+	 * Método para crear un cuestionario de salud de un Alumno dado.
+	 *
+	 * @param cuestionario json cuestionario.
+	 * @param result binding result.
+	 * @param jwt	Token JWT.
+	 * @param rutUsuario RUT usuario de la session.
+	 * @return cuestionario creado.
+	 */
+	@PostMapping(path = "/crear/{rutUsuario}")
 	@Transactional
 	@PreAuthorize("hasAnyRole('ROLE_ADM', 'ROLE_TEACHER', 'ROLE_APO', 'ROLE_ALUMNO')")
-	public ResponseEntity<?> crear(@Valid @RequestBody CuestionarioSalud cuestionario, BindingResult result) {
-		getLogger().info("[crear][cuestionario][" + cuestionario + "][ORION_INI]");
+	public ResponseEntity<?> crear(
+			@Valid @RequestBody CuestionarioSalud cuestionario,
+				BindingResult result,
+					@RequestHeader(AUTHORIZATION) final String jwt,
+						@PathVariable Long rutUsuario) {
+
+		getLogger().info("[crear][cuestionario][" + cuestionario + "][rutUsuario][" + rutUsuario + "][ORION_INI]");
+		if ( result.hasErrors() ) {
+			return this.validar(result);
+		}
+		jwtTokenUtil.validarUsuarioVsRutConsulta(context, jwt, rutUsuario);
+		jwtTokenUtil.validarAlumnosDeUsuario(rutUsuario, cuestionario.getAlumno().getRut());
+		getLogger().info("[crear][cuestionario][" + cuestionario
+				+ "][rutUsuario][" + rutUsuario + "][despues de validacion de session y de alumnos]");
 		try {
-			Optional<CuestionarioSalud> o = service.findById(cuestionario.getId());	
-			
+			Optional<CuestionarioSalud> o = service.findById(cuestionario.getId());
 			if ( o.isPresent() ) {
 				CuestionarioSalud cuestionarioDb = o.get();
 				getLogger().info("[crear][cuestionario][" + cuestionario + "][ORION_CREATED]");
 				return ResponseEntity.status(HttpStatus.CREATED).body(cuestionarioDb);
 			}
-			
 			CuestionarioSalud entityDb = service.save(cuestionario);
 			getLogger().info("[crear][cuestionario][" + cuestionario + "][ORION_OK]");
 			return ResponseEntity.status(HttpStatus.CREATED).body(entityDb);
 		} 
 		catch (Exception e) {
-			getLogger().error("[crear][cuestionario][" + cuestionario + "][ORION_BAD_REQUEST]");
+			getLogger().error("[crear][cuestionario][" + cuestionario + "][ORION_BAD_REQUEST]", e);
 			throw new OrionException("ESPECIAL", HttpStatus.BAD_REQUEST, e.getMessage() );
 		}
 	}
 
-	@PutMapping("/editar/{id}")
+	/**
+	 * Método para editar un cuestionario de salud de un Alumno dado.
+	 *
+	 * @param cuestionario
+	 * @param result
+	 * @param jwt
+	 * @param id
+	 * @param rutUsuario
+	 * @return
+	 */
+	@PutMapping("/editar/{id}/{rutUsuario}")
 	@Transactional
 	@PreAuthorize("hasAnyRole('ROLE_ADM', 'ROLE_TEACHER', 'ROLE_APO', 'ROLE_ALUMNO')")
-	public ResponseEntity<?> editar(@RequestBody CuestionarioSalud cuestionario, @PathVariable Long id) {
-		getLogger().info("[editar][id][" + id + "][ORION_INI]");
+	public ResponseEntity<?> editar(@Valid @RequestBody CuestionarioSalud cuestionario,
+										BindingResult result,
+											@RequestHeader(AUTHORIZATION) final String jwt,
+												@PathVariable Long id, @PathVariable Long rutUsuario) {
+		getLogger().info("[editar][id][" + id + "][rutUsuario][" + rutUsuario + "][ORION_INI]");
+		jwtTokenUtil.validarUsuarioVsRutConsulta(context, jwt, rutUsuario);
+		jwtTokenUtil.validarAlumnosDeUsuario(rutUsuario, cuestionario.getAlumno().getRut());
+		if ( result.hasErrors() ) {
+			return this.validar(result);
+		}
+
 		Optional<CuestionarioSalud> o = service.findById(id);		
 		if ( o.isEmpty() ) {
 			getLogger().info("[editar][id][" + id + "][ORION_NOT_FOUND]");
@@ -107,12 +142,16 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(cuestionarioDb));		
 	}
 
-	@PutMapping("/{id}/asignar-respuestas")
+	@PutMapping("/{id}/asignar-respuestas/{rutUsuario}")
 	@Transactional
 	@PreAuthorize("hasAnyRole('ROLE_ADM', 'ROLE_TEACHER', 'ROLE_APO', 'ROLE_ALUMNO')")
-	public ResponseEntity<?> asignarRespuestas(@RequestBody List<Respuesta> respuestas, @PathVariable Long id) {
+	public ResponseEntity<?> asignarRespuestas(@RequestBody List<Respuesta> respuestas,
+											   	@PathVariable Long id,
+											   		@RequestHeader(AUTHORIZATION) final String jwt,
+											   			@PathVariable Long rutUsuario) {
 
-		getLogger().info("[asignarRespuestas][idCuestionario][" + id + "][ORION_INI]");
+		getLogger().info("[asignarRespuestas][idCuestionario][" + id + "][rutUsuario][" + rutUsuario + "][ORION_INI]");
+		jwtTokenUtil.validarUsuarioVsRutConsulta(context, jwt, rutUsuario);
 		Optional<CuestionarioSalud> oc = this.service.findById(id);
 		
 		if ( oc.isEmpty() ) {
@@ -129,11 +168,16 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 		return ResponseEntity.status(HttpStatus.CREATED).body(this.service.save(cuestionarioDb));
 	}
 	
-	@PutMapping("/{id}/editar-respuesta")
+	@PutMapping("/{id}/editar-respuesta/{rutUsuario}")
 	@Transactional
 	@PreAuthorize("hasAnyRole('ROLE_ADM', 'ROLE_TEACHER', 'ROLE_APO', 'ROLE_ALUMNO')")
-	public ResponseEntity<?> editarRespuesta(@RequestBody Respuesta respuesta, @PathVariable Long id) {
-		getLogger().info("[editarRespuesta][idCuestionario][" + id + "][ORION_INI]");
+	public ResponseEntity<?> editarRespuesta(@RequestBody Respuesta respuesta,
+											 @PathVariable Long id,
+											 @RequestHeader(AUTHORIZATION) final String jwt,
+											 @PathVariable Long rutUsuario) {
+		getLogger().info("[editarRespuesta][idCuestionario][" + id + "][rutUsuario]["
+				+ rutUsuario + "][ORION_INI]");
+		jwtTokenUtil.validarUsuarioVsRutConsulta(context, jwt, rutUsuario);
 		Optional<CuestionarioSalud> oc = this.service.findById(id);
 		
 		if ( oc.isEmpty() ) {
