@@ -70,7 +70,8 @@ public class AlumnoController extends CommonController<Alumno, AlumnoService> {
 		Alumno entityDb = service.save(alumno);
 		return ResponseEntity.status(HttpStatus.CREATED).body(entityDb);
 	}
-	
+
+
 	@PostMapping("/crear-con-foto")
 	@Transactional
 	@PreAuthorize("hasAnyRole('ROLE_ADM')")

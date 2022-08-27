@@ -3,6 +3,7 @@ package cl.patinaje.orion.cloud.ms.services.impl;
 
 import cl.patinaje.orion.cloud.ms.models.entity.Usuario;
 import cl.patinaje.orion.cloud.ms.models.repository.UsuarioRepository;
+import cl.patinaje.orion.cloud.ms.security.jwt.JwtTokenUtil;
 import cl.patinaje.orion.cloud.ms.security.jwt.JwtUserFactory;
 
 import java.util.Optional;
@@ -20,12 +21,14 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     UsuarioRepository repository;
 
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
+
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        String dividido[] = username.split("-");
-    	Long rutUsuario = Long.parseLong(dividido[0]);
-    	Optional<Usuario> o = repository.findById(rutUsuario);
+        Long rutUsuario = jwtTokenUtil.getRutUsuario(username);
+        Optional<Usuario> o = repository.findById(rutUsuario);
     	
     	if ( o.isEmpty() ) {
     		throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
@@ -33,5 +36,7 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
     	Usuario usr = o.get();    	
         return JwtUserFactory.create(usr);        
     }
+
+
 
 }

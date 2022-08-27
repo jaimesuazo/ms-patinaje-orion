@@ -1,5 +1,8 @@
 package cl.patinaje.orion.cloud.ms.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -70,6 +73,7 @@ public class Usuario {
 
     @Column(length = 255)
     @NotBlank(message = "El campo password no puede ser vacío")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String clave;
     
     private LocalDate lastPasswordResetDate;
@@ -77,6 +81,15 @@ public class Usuario {
     public Usuario() {
         this.alumnos =  new ArrayList<>();
         this.perfiles =  new ArrayList<>();
+    }
+
+    @JsonIgnore
+    public String getClave() {
+        return clave;
+    }
+
+    public void setClave(String clave) {
+        this.clave = clave;
     }
 
     @Override

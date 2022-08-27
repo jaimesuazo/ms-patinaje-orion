@@ -185,13 +185,15 @@ public class JwtTokenUtil implements Serializable {
 
     /**
      * Método que valida el RUT del usuario de la sesion vs el RUT consultado enviado por parámetro al MS.
+     *
+     *
      * @param context para obtener la session.
      * @param token JWT de la session.
      * @param rutConsulta enviado al MS.
      * @return true si el RUT de la session es el mismo que se consulta al MS.
      *         false el RUT de la session no es el mismo que se consulta al MS.
      */
-    public boolean validarUsuarioVsRutConsulta(HttpServletRequest context, String token, Long rutConsulta) {
+    public boolean validarUsuarioVsRutConsulta(HttpServletRequest context, String token, String rutConsulta) {
         getLogger().info("[validarUsuarioVsRutConsulta][rutConsulta][" + rutConsulta + "]");
         String rutToken = this.getUsernameFromToken(token);
         getLogger().debug("[validarUsuarioVsRutConsulta][rutToken][" + rutToken + "]");
@@ -206,7 +208,7 @@ public class JwtTokenUtil implements Serializable {
 
                 if ( roles.get(0).toString().trim().equals("ROLE_APO")
                         ||  roles.get(0).toString().trim().equals("ROLE_ALUMNO") ) {
-                    if (rutToken != null && !rutToken.equals( String.valueOf( rutConsulta) )) {
+                    if (rutToken != null && !rutToken.trim().equals( String.valueOf( rutConsulta) )) {
                         throw new OrionException("OrionSecurityRutSesionException",
                                 HttpStatus.FORBIDDEN,
                                     "El rut consultado no es el mismo de la sesion");
@@ -235,7 +237,15 @@ public class JwtTokenUtil implements Serializable {
         return true;
     }
 
+    public Long getRutUsuario(String username) {
+        String dividido[] = username.split("-");
+        Long rutUsuario = Long.parseLong(dividido[0]);
+        return rutUsuario;
+    }
+
     protected Logger getLogger() {
         return logger;
     }
+
+
 }

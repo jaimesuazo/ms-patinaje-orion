@@ -41,7 +41,7 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 	 * @param cuestionario json cuestionario.
 	 * @param result binding result.
 	 * @param jwt	Token JWT.
-	 * @param rutUsuario RUT usuario de la session.
+	 * @param rutUsuario RUT usuario con guión y DV, de la session.
 	 * @return cuestionario creado.
 	 */
 	@PostMapping(path = "/crear/{rutUsuario}")
@@ -51,14 +51,14 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 			@Valid @RequestBody CuestionarioSalud cuestionario,
 				BindingResult result,
 					@RequestHeader(AUTHORIZATION) final String jwt,
-						@PathVariable Long rutUsuario) {
+						@PathVariable String rutUsuario) {
 
 		getLogger().info("[crear][cuestionario][" + cuestionario + "][rutUsuario][" + rutUsuario + "][ORION_INI]");
 		if ( result.hasErrors() ) {
 			return this.validar(result);
 		}
 		jwtTokenUtil.validarUsuarioVsRutConsulta(context, jwt, rutUsuario);
-		jwtTokenUtil.validarAlumnosDeUsuario(rutUsuario, cuestionario.getAlumno().getRut());
+		jwtTokenUtil.validarAlumnosDeUsuario(jwtTokenUtil.getRutUsuario(rutUsuario), cuestionario.getAlumno().getRut());
 		getLogger().info("[crear][cuestionario][" + cuestionario
 				+ "][rutUsuario][" + rutUsuario + "][despues de validacion de session y de alumnos]");
 		try {
@@ -94,10 +94,10 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 	public ResponseEntity<?> editar(@Valid @RequestBody CuestionarioSalud cuestionario,
 										BindingResult result,
 											@RequestHeader(AUTHORIZATION) final String jwt,
-												@PathVariable Long id, @PathVariable Long rutUsuario) {
+												@PathVariable Long id, @PathVariable String rutUsuario) {
 		getLogger().info("[editar][id][" + id + "][rutUsuario][" + rutUsuario + "][ORION_INI]");
 		jwtTokenUtil.validarUsuarioVsRutConsulta(context, jwt, rutUsuario);
-		jwtTokenUtil.validarAlumnosDeUsuario(rutUsuario, cuestionario.getAlumno().getRut());
+		jwtTokenUtil.validarAlumnosDeUsuario(jwtTokenUtil.getRutUsuario(rutUsuario), cuestionario.getAlumno().getRut());
 		if ( result.hasErrors() ) {
 			return this.validar(result);
 		}
@@ -148,7 +148,7 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 	public ResponseEntity<?> asignarRespuestas(@RequestBody List<Respuesta> respuestas,
 											   	@PathVariable Long id,
 											   		@RequestHeader(AUTHORIZATION) final String jwt,
-											   			@PathVariable Long rutUsuario) {
+											   			@PathVariable String rutUsuario) {
 
 		getLogger().info("[asignarRespuestas][idCuestionario][" + id + "][rutUsuario][" + rutUsuario + "][ORION_INI]");
 		jwtTokenUtil.validarUsuarioVsRutConsulta(context, jwt, rutUsuario);
@@ -174,7 +174,7 @@ public class CuestionarioSaludController  extends CommonController<CuestionarioS
 	public ResponseEntity<?> editarRespuesta(@RequestBody Respuesta respuesta,
 											 @PathVariable Long id,
 											 @RequestHeader(AUTHORIZATION) final String jwt,
-											 @PathVariable Long rutUsuario) {
+											 @PathVariable String rutUsuario) {
 		getLogger().info("[editarRespuesta][idCuestionario][" + id + "][rutUsuario]["
 				+ rutUsuario + "][ORION_INI]");
 		jwtTokenUtil.validarUsuarioVsRutConsulta(context, jwt, rutUsuario);
