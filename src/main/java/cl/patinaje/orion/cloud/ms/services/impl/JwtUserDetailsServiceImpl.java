@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class JwtUserDetailsServiceImpl implements UserDetailsService {
@@ -20,15 +21,17 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
     UsuarioRepository repository;
 
     @Override
+    @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    	
-    	Long rutUsuario = Long.parseLong(username);
+        String dividido[] = username.split("-");
+    	Long rutUsuario = Long.parseLong(dividido[0]);
     	Optional<Usuario> o = repository.findById(rutUsuario);
     	
-    	if (o.isEmpty()) {
+    	if ( o.isEmpty() ) {
     		throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
     	}
     	Usuario usr = o.get();    	
         return JwtUserFactory.create(usr);        
     }
+
 }

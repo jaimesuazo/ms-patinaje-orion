@@ -23,6 +23,9 @@ public class Usuario {
     @Id
     private Long rut;
 
+    
+    private String username;
+
     @Size(min = 1, max = 1)
     @Column(length = 1)
     @NotBlank(message = "El campo dv no puede ser vacío")

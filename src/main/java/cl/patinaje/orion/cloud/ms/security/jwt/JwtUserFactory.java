@@ -22,6 +22,14 @@ public final class JwtUserFactory {
     private JwtUserFactory() {
     }
 
+    /**
+     * Método que crea el JwtUser a partir del Usuario.
+     * Este método es llamado desde
+     * cl.patinaje.orion.cloud.ms.services.impl.JwtUserDetailsServiceImpl#loadUserByUsername(java.lang.String)
+     *
+     * @param user de tipo Usuario
+     * @return JwtUser
+     */
     public static JwtUser create(Usuario user) {
 
     	if (user != null && user.getLastPasswordResetDate() == null ) {
@@ -42,7 +50,7 @@ public final class JwtUserFactory {
         logger.debug("[create][listaPerfiles]" + user.getPerfiles());
         return new JwtUser(
                 user.getRut(),
-                String.valueOf( user.getRut() ),
+                String.valueOf( user.getRut() + "-" + user.getDv().toUpperCase() ),
                 user.getClave(),
                 user.getEmail(),
                 mapToGrantedAuthorities(listaPerfiles),

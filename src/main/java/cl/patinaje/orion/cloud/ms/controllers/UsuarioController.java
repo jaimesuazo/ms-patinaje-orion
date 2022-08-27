@@ -100,8 +100,9 @@ public class UsuarioController extends CommonController<Usuario, UsuarioService>
             return this.validar(result);
         }
         usuario.setDv( usuario.getDv().toUpperCase() );
+        usuario.setUsername( usuario.getRut() + "-" + usuario.getDv() );
         usuario.setClave( encoder.encode(usuario.getClave()) );
-        Usuario entityDb = service.save(usuario);
+        Usuario entityDb = service.save( usuario );
         return ResponseEntity.status(HttpStatus.CREATED).body(entityDb);
     }
 
