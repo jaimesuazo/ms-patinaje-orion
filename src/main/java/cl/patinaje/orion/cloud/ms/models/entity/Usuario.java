@@ -10,6 +10,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class Usuario {
     private String email;
 
     @Column(length = 255)
-    @NotBlank(message = "El campo password no puede ser vacío")
+    @NotEmpty(message = "El campo password no puede ser vacío")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String clave;
     

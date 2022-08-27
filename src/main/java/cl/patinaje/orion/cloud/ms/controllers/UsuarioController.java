@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
@@ -94,13 +95,14 @@ public class UsuarioController extends CommonController<Usuario, UsuarioService>
         if (    SecurityContextHolder.getContext() != null &&
                 SecurityContextHolder.getContext().getAuthentication() != null &&
                 SecurityContextHolder.getContext().getAuthentication().getAuthorities() != null &&
-                SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains("ROLE_ADM") ) {
+                SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADM")) ) {
             getLogger().info("[editar][rutUsuario][" + rutUsuario + "][ROLE_ADM]");
             usuarioDb.setPerfiles(usuario.getPerfiles());
+            usuarioDb.setAlumnos(usuario.getAlumnos());
         }
 
         usuarioDb.setEmail(usuario.getEmail());
-        usuarioDb.setAlumnos(usuarioDb.getAlumnos());
+
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(usuarioDb));
     }
 

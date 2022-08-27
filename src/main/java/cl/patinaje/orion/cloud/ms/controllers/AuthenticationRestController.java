@@ -10,6 +10,7 @@ import cl.patinaje.orion.cloud.ms.security.jwt.JwtUser;
 import cl.patinaje.orion.cloud.ms.services.impl.JwtUserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mobile.device.Device;
 import org.springframework.mobile.device.DevicePlatform;
@@ -91,6 +92,17 @@ public class AuthenticationRestController {
         } else {
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout() {
+        /*
+        if ( request.getSession(false) != null ) {
+            request.getSession(false).removeAttribute("userDetails");
+            request.getSession(false).invalidate();
+            getLogger().info("userDetails removed for user " + username);
+        } */
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }
