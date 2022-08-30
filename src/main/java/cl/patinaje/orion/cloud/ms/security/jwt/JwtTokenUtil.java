@@ -16,10 +16,11 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @Component
 public class JwtTokenUtil implements Serializable {
@@ -44,6 +45,8 @@ public class JwtTokenUtil implements Serializable {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    public ConcurrentMap<String, Date> tokenLogout = new ConcurrentHashMap<>();
 
     public String getUsernameFromToken(String token) {
         String username;
@@ -103,6 +106,7 @@ public class JwtTokenUtil implements Serializable {
     }
 
     private Date generateExpirationDate() {
+        System.out.println("[generateExpirationDate]" + new Date(System.currentTimeMillis() + expiration * 1000));
         return new Date(System.currentTimeMillis() + expiration * 1000);
     }
 
@@ -247,5 +251,21 @@ public class JwtTokenUtil implements Serializable {
         return logger;
     }
 
+
+    public void agregarTokenLogout(String tokenJwt) {
+        Date now = new Date(System.currentTimeMillis());
+        Iterator<String> iterator = tokenLogout.keySet().iterator();
+        while( iterator.hasNext() ) {
+            String token = iterator.next();
+            Date fechaPaso = tokenLogout.get(token);
+            long diffHours = now.getTime() - fechaPaso.getTime() / (60 * 60 * 1000);
+
+            if( diffHours >= 1 ){
+                iterator.remove();
+            }
+        }
+        tokenLogout.put( tokenJwt, now  );
+
+    }
 
 }

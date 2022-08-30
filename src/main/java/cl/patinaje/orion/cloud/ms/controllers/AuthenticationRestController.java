@@ -20,12 +20,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class AuthenticationRestController {
+
+    @Value("${jwt.header}")
+    public static final String AUTHORIZATION = "Authorization";
 
     @Value("${jwt.header}")
     private String tokenHeader;
@@ -94,14 +99,9 @@ public class AuthenticationRestController {
         }
     }
 
-    @GetMapping("/logout")
-    public ResponseEntity<?> logout() {
-        /*
-        if ( request.getSession(false) != null ) {
-            request.getSession(false).removeAttribute("userDetails");
-            request.getSession(false).invalidate();
-            getLogger().info("userDetails removed for user " + username);
-        } */
+    @GetMapping("/logout1")
+    public ResponseEntity<?> logout(@RequestHeader(AUTHORIZATION) final String jwt) {
+        jwtTokenUtil.agregarTokenLogout(jwt);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
